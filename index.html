@@ -5,7 +5,7 @@
   document.addEventListener('DOMContentLoaded', () => {
     const catalog = [
       { name: 'FocusFlow Pro', category: 'Üretkenlik', price: 349, description: 'Görev, proje ve günlük plan yönetimi için dijital çalışma alanı.' },
-      { name: 'Kereme giriş', category: 'Tasarım', price: 499, description: 'Hızlı prototipleme için hazırlanmış yaratıcı varlık paketi.' },
+      { name: 'PixelCraft Kit', category: 'Tasarım', price: 499, description: 'Hızlı prototipleme için hazırlanmış yaratıcı varlık paketi.' },
       { name: 'DevStack Tools', category: 'Geliştirici', price: 649, description: 'Geliştirme akışını sadeleştiren pratik araç koleksiyonu.' }
     ];
     const page = document.querySelector('#sitePage');
@@ -75,6 +75,7 @@
   .pageNav button{font-size:0}.pageNav button::after{content:'Ana sayfaya dön';font-size:14px}
   .cart-trigger{position:relative}.cart-count{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:7px;padding:0 5px;border-radius:20px;background:#8d4dff;color:#fff;font:10px 'DM Mono',monospace}.cart-backdrop{position:fixed;z-index:70;inset:0;background:#050308aa;opacity:0;pointer-events:none;transition:opacity .24s}.cart-drawer{position:fixed;z-index:71;right:0;top:0;width:min(460px,100%);height:100dvh;padding:25px;background:#120e19;border-left:1px solid #3d2e50;transform:translateX(104%);transition:transform .32s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:-24px 0 60px #0008}.cart-open .cart-backdrop{opacity:1;pointer-events:auto}.cart-open .cart-drawer{transform:none}.cart-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:20px;border-bottom:1px solid #342840}.cart-top h2{margin:0;font-size:25px;letter-spacing:-.05em}.cart-close{border:1px solid #4a3a5d;background:#1c1526;color:#e9ddff;width:38px;height:38px;border-radius:7px;font-size:20px;cursor:pointer}.cart-items{flex:1;overflow:auto;padding:10px 0}.cart-empty{padding:48px 0;color:#b8abc7;text-align:center;line-height:1.65}.cart-item{display:grid;grid-template-columns:44px 1fr auto;gap:13px;align-items:center;padding:18px 0;border-bottom:1px solid #2f2439}.cart-thumb{display:grid;place-items:center;width:44px;height:44px;background:linear-gradient(135deg,#3e2368,#8950d8);font:700 13px 'DM Mono',monospace;color:#fff}.cart-item b{display:block;font-size:14px}.cart-item small{color:#b5a6c6;font-size:12px}.cart-remove{margin-top:5px;border:0;background:none;color:#c5a4ff;padding:0;font-size:12px;cursor:pointer}.cart-price{font-weight:800;font-size:14px}.cart-summary{border-top:1px solid #3a2d49;padding-top:20px}.cart-total{display:flex;justify-content:space-between;font-size:16px;font-weight:800;margin-bottom:14px}.cart-summary .button{width:100%}.cart-clear{display:block;width:100%;margin-top:10px;border:0;background:none;color:#b7a6c9;font:12px Manrope;cursor:pointer}.cart-note{margin:14px 0 0;color:#978aa8;font-size:11px;line-height:1.5;text-align:center}@keyframes rivenna-rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes rivenna-pulse{0%,100%{box-shadow:0 8px 18px #7039d833}50%{box-shadow:0 12px 29px #9b61ff77}}.hero-grid>*,.trust-item,.product,.benefit{animation:rivenna-rise .55s both}.hero-grid>*:nth-child(2),.trust-item:nth-child(2),.product:nth-child(2),.benefit:nth-child(2){animation-delay:.1s}.trust-item:nth-child(3),.product:nth-child(3),.benefit:nth-child(3){animation-delay:.2s}.primary{animation:rivenna-pulse 2.8s ease-in-out infinite}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
   .feedback{background:#0f0c15;border-top:1px solid #2d2438;border-bottom:1px solid #2d2438}.feedback-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:36px;align-items:start}.feedback h2{font-size:34px;letter-spacing:-.06em;margin:10px 0}.feedback-intro{color:#b9acc8;line-height:1.7}.rating-line{display:flex;gap:5px;margin:24px 0;color:#c7a5ff;font-size:21px}.review-list{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.review-card{padding:20px;background:#16111f;border:1px solid #382b49}.review-card p{margin:0 0 15px;color:#ddd3e9;line-height:1.6;font-size:14px}.review-card b{font-size:13px}.review-card span{display:block;margin-top:4px;color:#a898b8;font-size:11px}.feedback-form{margin-top:18px;padding:20px;background:#16111f;border:1px solid #382b49}.feedback-form h3{margin:0 0 13px;font-size:16px}.feedback-form textarea{width:100%;min-height:92px;resize:vertical;background:#0e0b14;border:1px solid #49395d;color:#fff;padding:12px;font:14px Manrope}.feedback-form select{background:#0e0b14;border:1px solid #49395d;color:#fff;padding:11px;font:14px Manrope;margin-bottom:10px}.feedback-form .button{margin-top:10px}@media(max-width:760px){.feedback-grid,.review-list{grid-template-columns:1fr}}
+  .auth-divider{display:flex;align-items:center;gap:10px;color:#9182a5;font:11px 'DM Mono',monospace;margin:20px 0}.auth-divider:before,.auth-divider:after{content:'';height:1px;flex:1;background:#342940}.auth-login{display:none}.auth-login.show{display:block}.auth-switch{border:0;background:none;padding:0;color:#c9a9ff;font:700 12px Manrope;cursor:pointer}.auth-status{margin-top:14px;padding:12px;border:1px solid #4a3960;background:#181220;color:#dacdea;font-size:12px;line-height:1.5}.auth-status:empty{display:none}.auth-status.error{border-color:#914558;color:#ffc3ce}.auth-status.success{border-color:#665391;color:#e6d8ff}
   </style>
   <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -136,6 +137,95 @@
     });
     renderCart(); renderReviews();
   });
+  </script>
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js';
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, reload, signOut } from 'https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js';
+
+    const firebaseConfig = {
+      apiKey: 'AIzaSyA0WbwhLLTGNoZMnWVIoyVkGlVIEqAGOVQ',
+      authDomain: 'rivenna-shoper.firebaseapp.com',
+      projectId: 'rivenna-shoper',
+      storageBucket: 'rivenna-shoper.firebasestorage.app',
+      messagingSenderId: '74323457303',
+      appId: '1:74323457303:web:1ad4e95e0a4c6cb06a3352',
+      measurementId: 'G-TLNLGGY3S5'
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    function message(text, type = '') {
+      const box = document.querySelector('#authStatus');
+      box.textContent = text;
+      box.className = 'auth-status ' + type;
+    }
+    function addLogoutButton() {
+      if (document.querySelector('#logoutButton')) return;
+      document.querySelector('.nav-actions').insertAdjacentHTML('beforeend', '<button class="button ghost" id="logoutButton">Çıkış Yap</button>');
+      document.querySelector('#logoutButton').addEventListener('click', async () => {
+        await signOut(auth);
+        localStorage.removeItem('rivennaAccount');
+        localStorage.removeItem('rivennaPendingProfile');
+        window.location.reload();
+      });
+    }
+    function syncAccount(user) {
+      if (!user || !user.emailVerified) return;
+      const saved = JSON.parse(localStorage.getItem('rivennaAccount') || '{}');
+      const pending = JSON.parse(localStorage.getItem('rivennaPendingProfile') || '{}');
+      const account = { name: saved.name || pending.name || user.email.split('@')[0], email: user.email, balance: Number(saved.balance || 0), verified: true };
+      localStorage.setItem('rivennaAccount', JSON.stringify(account));
+      localStorage.removeItem('rivennaPendingProfile');
+      const register = document.querySelector('#registerButton');
+      const hero = document.querySelector('#heroAccount');
+      const openAccount = document.querySelector('#openAccount');
+      const accountButton = document.querySelector('#accountButton');
+      if (register) register.style.display = 'none';
+      if (hero) hero.style.display = 'none';
+      if (openAccount) openAccount.style.display = 'none';
+      if (accountButton) accountButton.textContent = account.name.split(' ')[0] + ' · Hesabım';
+      addLogoutButton();
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+      if (localStorage.getItem('rivennaAccount')) addLogoutButton();
+      const registerForm = document.querySelector('#registerForm');
+      const accountModal = document.querySelector('#accountModal .modal');
+      accountModal.querySelector('.hint').textContent = 'Hesabın, e-posta adresindeki doğrulama bağlantısına tıkladıktan sonra aktif olur.';
+      registerForm.insertAdjacentHTML('afterend', '<div class="auth-divider">VEYA</div><button class="auth-switch" id="showLogin">Zaten hesabın var mı? Giriş yap</button><form class="auth-login" id="loginForm"><div class="field"><label>E-POSTA ADRESİ</label><input required type="email" id="loginEmail" placeholder="ornek@eposta.com"></div><div class="field"><label>ŞİFRE</label><input required type="password" id="loginPassword" placeholder="Şifren"></div><button class="button primary" type="submit">Giriş Yap</button><button class="auth-switch" type="button" id="showRegister">Yeni hesap oluştur</button></form><div id="authStatus" class="auth-status" role="status"></div>');
+      const loginForm = document.querySelector('#loginForm');
+      document.querySelector('#showLogin').onclick = () => { loginForm.classList.add('show'); registerForm.style.display = 'none'; };
+      document.querySelector('#showRegister').onclick = () => { loginForm.classList.remove('show'); registerForm.style.display = 'block'; };
+      registerForm.onsubmit = async event => {
+        event.preventDefault();
+        const name = document.querySelector('#name').value.trim();
+        const email = document.querySelector('#email').value.trim();
+        const password = registerForm.querySelector('input[type="password"]').value;
+        if (password.length < 6) return message('Şifre en az 6 karakter olmalı.', 'error');
+        const submit = registerForm.querySelector('button[type="submit"]');
+        submit.disabled = true;
+        try {
+          const result = await createUserWithEmailAndPassword(auth, email, password);
+          localStorage.setItem('rivennaPendingProfile', JSON.stringify({ name, email }));
+          await sendEmailVerification(result.user, { url: window.location.origin, handleCodeInApp: false });
+          message('Doğrulama bağlantısı e-posta adresine gönderildi. Linke tıklayıp ardından giriş yap.', 'success');
+        } catch (error) {
+          const texts = { 'auth/email-already-in-use': 'Bu e-posta ile zaten bir hesap var. Giriş yapmayı dene.', 'auth/invalid-email': 'Geçerli bir e-posta adresi gir.', 'auth/weak-password': 'Daha güçlü bir şifre seç.' };
+          message(texts[error.code] || 'Hesap oluşturulamadı. Firebase ayarlarını kontrol et.', 'error');
+        } finally { submit.disabled = false; }
+      };
+      loginForm.onsubmit = async event => {
+        event.preventDefault();
+        try {
+          const result = await signInWithEmailAndPassword(auth, document.querySelector('#loginEmail').value.trim(), document.querySelector('#loginPassword').value);
+          await reload(result.user);
+          if (!result.user.emailVerified) { message('E-posta henüz onaylanmadı. Gelen kutundaki doğrulama bağlantısını aç.', 'error'); return; }
+          syncAccount(result.user);
+          message('Giriş başarılı. Hesabın doğrulandı.', 'success');
+          setTimeout(() => document.querySelector('[data-close="accountModal"]').click(), 900);
+        } catch (error) { message('E-posta veya şifre hatalı.', 'error'); }
+      };
+      onAuthStateChanged(auth, async user => { if (user) { await reload(user); syncAccount(user); } });
+    });
   </script>
 </head>
 <body>
