@@ -12,7 +12,12 @@
     const content = document.querySelector('#pageContent');
     const nav = document.querySelector('nav');
     const heroLink = document.querySelector('.hero-buttons a');
-    function closePage() { page.classList.remove('open'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+    function closePage() {
+      page.classList.remove('open');
+      document.querySelector('#paymentModal')?.classList.remove('open');
+      document.documentElement.classList.remove('cart-open');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     function openProduct(index) {
       const item = catalog[index];
       content.innerHTML = `<div class="page-content"><div class="page-kicker">${item.category}</div><div class="product-layout"><div><h1 class="page-title">${item.name}</h1><p class="page-lead">${item.description}</p><div class="product-preview">${item.name.slice(0,2).toUpperCase()}/</div></div><aside class="product-panel"><div class="page-kicker">DİJİTAL ÜRÜN</div><div class="price">₺${item.price}</div><p>Ödeme onayından sonra teslimat bilgileri hesabında görünür.</p><ul class="product-list"><li>Ürün detayları sipariş öncesi görünür</li><li>Hesabından sipariş takibi</li><li>Ödeme bildirimi ile manuel onay</li></ul><button class="button primary" id="buyProduct">Sepete Ekle</button></aside></div><div class="page-cta"><h2>Satın almaya hazır mısın?</h2><p>Ödeme yöntemini seç, bildirimi tamamla ve sipariş durumunu tek ekrandan takip et.</p><button class="button" id="buyProductBottom">Sepete Git ve Ödeme Yöntemini Seç</button></div></div>`;
@@ -22,8 +27,19 @@
         page.classList.remove('open'); document.querySelector('#addBalance').click();
       });
       document.querySelector('#buyProductBottom').addEventListener('click', () => {
-        if (window.rivennaDirectCheckout) { window.rivennaDirectCheckout(item); return; }
-        document.querySelector('#buyProduct').click();
+        if (!localStorage.getItem('rivennaAccount')) {
+          page.classList.remove('open');
+          document.querySelector('#accountButton').click();
+          return;
+        }
+        const modal = document.querySelector('#paymentModal');
+        modal.querySelector('h2').textContent = 'Demo sipariş ödemesi';
+        modal.querySelector('p').textContent = 'Ödeme yöntemini seçerek test akışını inceleyebilirsin. Gerçek transfer yapılmaz.';
+        document.querySelector('#paymentAmount').value = item.price;
+        document.querySelector('#paymentAmount').readOnly = true;
+        document.querySelector('#paymentNote').textContent = 'RIVENNA SİPARİŞ ' + Date.now().toString().slice(-6);
+        page.classList.remove('open');
+        modal.classList.add('open');
       });
     }
     function openPage(name) {
@@ -33,6 +49,8 @@
         'Hesabım': '<div class="page-content"><div class="page-kicker">RIVENNA HESABI</div><h1 class="page-title">Siparişlerin, bakiyen<br>ve profilin bir arada.</h1><p class="page-lead">Hesap oluşturduktan sonra ödeme bildirimlerini, bakiye durumunu ve ürünlerine ait bilgileri bu alandan takip edebilirsin.</p><div class="info-row"><article class="info-card"><b>Profil bilgileri</b><p>Ad, e-posta ve hesap detaylarını güncelle.</p></article><article class="info-card"><b>Güvenlik</b><p>Güvenlik tercihini hesap ekranından yönet.</p></article><article class="info-card"><b>Bakiye takibi</b><p>Ödeme bildirimi oluştur ve onay durumunu izle.</p></article></div><div class="page-cta"><h2>Rivenna hesabını aç</h2><p>Ürünleri ve ödeme adımlarını tek noktadan yönetmek için devam et.</p><button class="button" id="openAccountFromPage">Hesap Oluştur</button></div></div>',
         'Destek': '<div class="page-content"><div class="page-kicker">DESTEK MERKEZİ</div><h1 class="page-title">Yardıma ihtiyacın olduğunda<br>buradayız.</h1><p class="page-lead">Hesabın, erişim sorunların veya site kullanımıyla ilgili desteğe tek yerden ulaşabilirsin.</p><div class="support-grid"><article class="support-card"><h2>Hızlı yardım</h2><p>Giriş yapma, e-posta doğrulama, hesap erişimi ve teknik sorunlarda önce hesabındaki bilgileri kontrol et. Çözülmezse destek ekibine yaz.</p><p class="support-note">Yanıt verirken hesabında kullandığın e-posta adresini paylaşman yeterlidir.</p></article><article class="support-card"><h2>Telegram destek</h2><p>Teknik yardım ve hesapla ilgili soruların için aşağıdaki destek hesaplarından bize ulaşabilirsin.</p><a class="support-link" href="https://t.me/artebaba" target="_blank" rel="noopener">Telegram: @artebaba</a><br><a class="support-link" href="https://t.me/sheakmee" target="_blank" rel="noopener">Telegram: @sheakmee</a></article></div><div class="page-cta"><h2>Destek talebi hazırlarken</h2><p>Sorunu, kullandığın e-posta adresini ve mümkünse ekran görüntüsünü ekle. Böylece daha hızlı yardımcı olabiliriz.</p></div></div>'
       };
+      document.querySelector('#paymentModal')?.classList.remove('open');
+      document.documentElement.classList.remove('cart-open');
       content.innerHTML = pages[name] || pages['Ürünler'];
       page.classList.add('open'); window.scrollTo(0, 0);
       content.querySelectorAll('[data-product]').forEach(button => button.addEventListener('click', () => openProduct(Number(button.dataset.product))));
@@ -44,6 +62,7 @@
       if (supportAccount) supportAccount.addEventListener('click', () => openPage('Hesabım'));
     }
     window.closePage = closePage;
+    document.querySelector('.brand').addEventListener('click', event => { event.preventDefault(); closePage(); });
     document.querySelector('.hero').insertAdjacentHTML('afterend', '<section class="trust-strip"><div class="shell"><div class="trust-item"><b>Net ürün bilgisi</b><span>Fiyat, tür ve teslimat adımı görünür.</span></div><div class="trust-item"><b>Hesap üzerinden takip</b><span>Profil, bakiye ve sipariş akışı tek noktada.</span></div><div class="trust-item"><b>Kontrollü ödeme bildirimi</b><span>Bakiye yalnızca onay sonrası eklenir.</span></div></div></section>');
     nav.querySelectorAll('a').forEach(link => link.addEventListener('click', event => { event.preventDefault(); openPage(link.textContent.trim()); }));
     heroLink.addEventListener('click', event => { event.preventDefault(); openPage('Ürünler'); });
@@ -78,7 +97,7 @@
   .pageNav button{font-size:0}.pageNav button::after{content:'Ana sayfaya dön';font-size:14px}
   .cart-trigger{position:relative}.cart-count{display:inline-grid;place-items:center;min-width:18px;height:18px;margin-left:7px;padding:0 5px;border-radius:20px;background:#8d4dff;color:#fff;font:10px 'DM Mono',monospace}.cart-backdrop{position:fixed;z-index:70;inset:0;background:#050308aa;opacity:0;pointer-events:none;transition:opacity .24s}.cart-drawer{position:fixed;z-index:71;right:0;top:0;width:min(460px,100%);height:100dvh;padding:25px;background:#120e19;border-left:1px solid #3d2e50;transform:translateX(104%);transition:transform .32s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:-24px 0 60px #0008}.cart-open .cart-backdrop{opacity:1;pointer-events:auto}.cart-open .cart-drawer{transform:none}.cart-top{display:flex;align-items:center;justify-content:space-between;padding-bottom:20px;border-bottom:1px solid #342840}.cart-top h2{margin:0;font-size:25px;letter-spacing:-.05em}.cart-close{border:1px solid #4a3a5d;background:#1c1526;color:#e9ddff;width:38px;height:38px;border-radius:7px;font-size:20px;cursor:pointer}.cart-items{flex:1;overflow:auto;padding:10px 0}.cart-empty{padding:48px 0;color:#b8abc7;text-align:center;line-height:1.65}.cart-item{display:grid;grid-template-columns:44px 1fr auto;gap:13px;align-items:center;padding:18px 0;border-bottom:1px solid #2f2439}.cart-thumb{display:grid;place-items:center;width:44px;height:44px;background:linear-gradient(135deg,#3e2368,#8950d8);font:700 13px 'DM Mono',monospace;color:#fff}.cart-item b{display:block;font-size:14px}.cart-item small{color:#b5a6c6;font-size:12px}.cart-remove{margin-top:5px;border:0;background:none;color:#c5a4ff;padding:0;font-size:12px;cursor:pointer}.cart-price{font-weight:800;font-size:14px}.cart-summary{border-top:1px solid #3a2d49;padding-top:20px}.cart-total{display:flex;justify-content:space-between;font-size:16px;font-weight:800;margin-bottom:14px}.cart-summary .button{width:100%}.cart-clear{display:block;width:100%;margin-top:10px;border:0;background:none;color:#b7a6c9;font:12px Manrope;cursor:pointer}.cart-note{margin:14px 0 0;color:#978aa8;font-size:11px;line-height:1.5;text-align:center}@keyframes rivenna-rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}@keyframes rivenna-pulse{0%,100%{box-shadow:0 8px 18px #7039d833}50%{box-shadow:0 12px 29px #9b61ff77}}.hero-grid>*,.trust-item,.product,.benefit{animation:rivenna-rise .55s both}.hero-grid>*:nth-child(2),.trust-item:nth-child(2),.product:nth-child(2),.benefit:nth-child(2){animation-delay:.1s}.trust-item:nth-child(3),.product:nth-child(3),.benefit:nth-child(3){animation-delay:.2s}.primary{animation:rivenna-pulse 2.8s ease-in-out infinite}@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
   .feedback{background:#0f0c15;border-top:1px solid #2d2438;border-bottom:1px solid #2d2438}.feedback-grid{display:grid;grid-template-columns:.85fr 1.15fr;gap:36px;align-items:start}.feedback h2{font-size:34px;letter-spacing:-.06em;margin:10px 0}.feedback-intro{color:#b9acc8;line-height:1.7}.rating-line{display:flex;gap:5px;margin:24px 0;color:#c7a5ff;font-size:21px}.review-list{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}.review-card{padding:20px;background:#16111f;border:1px solid #382b49}.review-card p{margin:0 0 15px;color:#ddd3e9;line-height:1.6;font-size:14px}.review-card b{font-size:13px}.review-card span{display:block;margin-top:4px;color:#a898b8;font-size:11px}.feedback-form{margin-top:18px;padding:20px;background:#16111f;border:1px solid #382b49}.feedback-form h3{margin:0 0 13px;font-size:16px}.feedback-form textarea{width:100%;min-height:92px;resize:vertical;background:#0e0b14;border:1px solid #49395d;color:#fff;padding:12px;font:14px Manrope}.feedback-form select{background:#0e0b14;border:1px solid #49395d;color:#fff;padding:11px;font:14px Manrope;margin-bottom:10px}.feedback-form .button{margin-top:10px}@media(max-width:760px){.feedback-grid,.review-list{grid-template-columns:1fr}}
-  .auth-divider{display:flex;align-items:center;gap:10px;color:#9182a5;font:11px 'DM Mono',monospace;margin:20px 0}.auth-divider:before,.auth-divider:after{content:'';height:1px;flex:1;background:#342940}.auth-login{display:none}.auth-login.show{display:block}.auth-switch{border:0;background:none;padding:0;color:#c9a9ff;font:700 12px Manrope;cursor:pointer}.auth-status{margin-top:14px;padding:12px;border:1px solid #4a3960;background:#181220;color:#dacdea;font-size:12px;line-height:1.5}.auth-status:empty{display:none}.auth-status.error{border-color:#914558;color:#ffc3ce}.auth-status.success{border-color:#665391;color:#e6d8ff}
+  .auth-divider{display:flex;align-items:center;gap:10px;color:#9182a5;font:11px 'DM Mono',monospace;margin:20px 0}.auth-divider:before,.auth-divider:after{content:'';height:1px;flex:1;background:#342940}.auth-login{display:none}.auth-login.show{display:block}.auth-login h3{margin:0 0 8px;font-size:19px}.auth-reset-copy{margin:0 0 15px}.auth-switch{border:0;background:none;padding:0;color:#c9a9ff;font:700 12px Manrope;cursor:pointer;margin:10px 12px 0 0}.auth-status{margin-top:14px;padding:12px;border:1px solid #4a3960;background:#181220;color:#dacdea;font-size:12px;line-height:1.5}.auth-status:empty{display:none}.auth-status.error{border-color:#914558;color:#ffc3ce}.auth-status.success{border-color:#665391;color:#e6d8ff}
   /* Son katman: daha sakin premium arka plan ve başlık dokusu */
   body{background-color:#09090f;background-image:radial-gradient(circle at 20% 10%,#2d1b4b55 0,transparent 25%),radial-gradient(circle at 88% 60%,#37196b44 0,transparent 27%),linear-gradient(115deg,#09090f 0%,#0d0a14 45%,#09090f 100%);background-size:auto}
   .announce{background:linear-gradient(90deg,#09090f,#171024 52%,#09090f);border-bottom:1px solid #2b2137}.announce .shell{height:42px;color:#d9ccec;letter-spacing:.08em}.announce b{color:#ab7cff}.hero{background:radial-gradient(circle at 82% 33%,#8c44ff 0,transparent 22%),radial-gradient(circle at 56% 100%,#3c176f 0,transparent 42%),linear-gradient(118deg,#09090f 0%,#130d20 50%,#33106c 100%)}.hero:before{opacity:.42;background-image:radial-gradient(#9a72d322 .7px,transparent .7px);background-size:17px 17px}.hero:after{content:'';position:absolute;inset:auto -10% -40% 32%;height:70%;background:radial-gradient(ellipse,#ad7cff25,transparent 65%);filter:blur(20px);pointer-events:none}.hero-grid{min-height:560px}.hero h1{max-width:720px}.visual-card{box-shadow:22px 26px 0 #07050b88,0 0 0 1px #b793ff20}.trust-strip{background:#0b0910;border-top:1px solid #332644}.trust-item{background:linear-gradient(120deg,#100d18,#151020)}footer{padding:35px 0;background:linear-gradient(90deg,#0a090f,#120c1b,#0a090f);border-top-color:#30243e}.feedback{background:radial-gradient(circle at 20% 40%,#38156222,transparent 30%),#0d0b13}
@@ -122,8 +141,8 @@
     window.rivennaDirectCheckout = product => {
       if (!localStorage.getItem('rivennaAccount')) { document.querySelector('#accountButton').click(); return; }
       const modal = document.querySelector('#paymentModal');
-      modal.querySelector('h2').textContent = 'Sipariş ödemesi';
-      modal.querySelector('p').textContent = 'Ödeme yöntemini seç, transferini tamamla ve bildirimi gönder. Bildirim manuel olarak kontrol edilir.';
+      modal.querySelector('h2').textContent = 'Demo sipariş ödemesi';
+      modal.querySelector('p').textContent = 'Ödeme yöntemini seçerek test akışını inceleyebilirsin. Gerçek transfer yapılmaz.';
       document.querySelector('#paymentAmount').value = product.price;
       document.querySelector('#paymentAmount').readOnly = true;
       document.querySelector('#paymentNote').textContent = 'RIVENNA SİPARİŞ ' + Date.now().toString().slice(-6);
@@ -142,8 +161,8 @@
       if (!localStorage.getItem('rivennaAccount')) { closeCart(); document.querySelector('#accountButton').click(); return; }
       const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
       const modal = document.querySelector('#paymentModal');
-      modal.querySelector('h2').textContent = 'Sipariş ödemesi';
-      modal.querySelector('p').textContent = 'Ödeme yöntemini seç, transferini tamamla ve bildirimi gönder. Bildirim manuel olarak kontrol edilir.';
+      modal.querySelector('h2').textContent = 'Demo sipariş ödemesi';
+      modal.querySelector('p').textContent = 'Ödeme yöntemini seçerek test akışını inceleyebilirsin. Gerçek transfer yapılmaz.';
       const amount = document.querySelector('#paymentAmount');
       const note = document.querySelector('#paymentNote');
       amount.value = total; amount.readOnly = true;
@@ -174,7 +193,7 @@
   </script>
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js';
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, onAuthStateChanged, reload, signOut } from 'https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js';
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendEmailVerification, sendPasswordResetEmail, onAuthStateChanged, reload, signOut } from 'https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js';
 
     const firebaseConfig = {
       apiKey: 'AIzaSyA0WbwhLLTGNoZMnWVIoyVkGlVIEqAGOVQ',
@@ -260,10 +279,14 @@
       const registerForm = document.querySelector('#registerForm');
       const accountModal = document.querySelector('#accountModal .modal');
       accountModal.querySelector('.hint').textContent = 'Hesabın, e-posta adresindeki doğrulama bağlantısına tıkladıktan sonra aktif olur.';
-      registerForm.insertAdjacentHTML('afterend', '<div class="auth-divider">VEYA</div><button class="auth-switch" id="showLogin">Zaten hesabın var mı? Giriş yap</button><form class="auth-login" id="loginForm"><div class="field"><label>E-POSTA ADRESİ</label><input required type="email" id="loginEmail" placeholder="ornek@eposta.com"></div><div class="field"><label>ŞİFRE</label><input required type="password" id="loginPassword" placeholder="Şifren"></div><button class="button primary" type="submit">Giriş Yap</button><button class="auth-switch" type="button" id="showRegister">Yeni hesap oluştur</button></form><div id="authStatus" class="auth-status" role="status"></div>');
+      registerForm.insertAdjacentHTML('afterend', '<div class="auth-divider">VEYA</div><button class="auth-switch" id="showLogin">Zaten hesabın var mı? Giriş yap</button><form class="auth-login" id="loginForm"><div class="field"><label>E-POSTA ADRESİ</label><input required type="email" id="loginEmail" placeholder="ornek@eposta.com"></div><div class="field"><label>ŞİFRE</label><input required type="password" id="loginPassword" placeholder="Şifren"></div><button class="button primary" type="submit">Giriş Yap</button><button class="auth-switch" type="button" id="showReset">Şifremi unuttum</button><button class="auth-switch" type="button" id="showRegister">Yeni hesap oluştur</button></form><form class="auth-login" id="resetForm"><h3>Şifreni sıfırla</h3><p class="auth-reset-copy">Hesabında kullandığın e-posta adresini gir. Sana güvenli bir şifre yenileme bağlantısı göndereceğiz.</p><div class="field"><label>E-POSTA ADRESİ</label><input required type="email" id="resetEmail" placeholder="ornek@eposta.com"></div><button class="button primary" type="submit">Sıfırlama Bağlantısı Gönder</button><button class="auth-switch" type="button" id="showLoginFromReset">Girişe dön</button></form><div id="authStatus" class="auth-status" role="status"></div>');
       const loginForm = document.querySelector('#loginForm');
-      document.querySelector('#showLogin').onclick = () => { loginForm.classList.add('show'); registerForm.style.display = 'none'; };
-      document.querySelector('#showRegister').onclick = () => { loginForm.classList.remove('show'); registerForm.style.display = 'block'; };
+      const resetForm = document.querySelector('#resetForm');
+      const showLogin = () => { loginForm.classList.add('show'); resetForm.classList.remove('show'); registerForm.style.display = 'none'; message(''); };
+      document.querySelector('#showLogin').onclick = showLogin;
+      document.querySelector('#showRegister').onclick = () => { loginForm.classList.remove('show'); resetForm.classList.remove('show'); registerForm.style.display = 'block'; message(''); };
+      document.querySelector('#showReset').onclick = () => { loginForm.classList.remove('show'); resetForm.classList.add('show'); registerForm.style.display = 'none'; document.querySelector('#resetEmail').value = document.querySelector('#loginEmail').value; message(''); };
+      document.querySelector('#showLoginFromReset').onclick = showLogin;
       registerForm.onsubmit = async event => {
         event.preventDefault();
         const name = document.querySelector('#name').value.trim();
@@ -293,6 +316,19 @@
           setTimeout(() => document.querySelector('[data-close="accountModal"]').click(), 900);
         } catch (error) { message('E-posta veya şifre hatalı.', 'error'); }
       };
+      resetForm.onsubmit = async event => {
+        event.preventDefault();
+        const email = document.querySelector('#resetEmail').value.trim();
+        const submit = resetForm.querySelector('button[type="submit"]');
+        submit.disabled = true;
+        try {
+          await sendPasswordResetEmail(auth, email);
+          message('Şifre sıfırlama bağlantısı e-posta adresine gönderildi. Gelen kutunu ve spam klasörünü kontrol et.', 'success');
+        } catch (error) {
+          const texts = { 'auth/invalid-email': 'Geçerli bir e-posta adresi gir.', 'auth/user-not-found': 'Bu e-posta adresiyle kayıtlı bir hesap bulunamadı. Firebase açılmadan önce oluşturulan eski yerel hesaplar için şifre sıfırlama çalışmaz; yeni hesap oluşturman gerekir.', 'auth/too-many-requests': 'Çok fazla istek gönderildi. Lütfen biraz sonra tekrar dene.', 'auth/network-request-failed': 'Bağlantı kurulamadı. İnternetini kontrol edip tekrar dene.' };
+          message(texts[error.code] || 'Sıfırlama bağlantısı gönderilemedi. Firebase ayarlarını kontrol et.', 'error');
+        } finally { submit.disabled = false; }
+      };
       onAuthStateChanged(auth, async user => { if (user) { await reload(user); if (user.emailVerified) syncAccount(user); else setSignedOut(); } else setSignedOut(); });
     });
   </script>
@@ -308,10 +344,10 @@
   </main>
   <footer id="destek"><div class="shell foot"><span>© 2026 Rivenna. Tüm hakları saklıdır.</span><span>Destek · Mesafeli Satış · Gizlilik · İade Politikası</span></div></footer>
   <div class="modal-wrap" id="accountModal"><div class="modal"><button class="close" data-close="accountModal">×</button><h2>Rivenna hesabını oluştur</h2><p>Sipariş ve lisanslarını tek noktadan yönetmek için bilgilerini gir.</p><form id="registerForm"><div class="field"><label>AD SOYAD</label><input required id="name" placeholder="Adın Soyadın"></div><div class="field"><label>E-POSTA ADRESİ</label><input required type="email" id="email" placeholder="ornek@eposta.com"></div><div class="field"><label>ŞİFRE</label><input required type="password" minlength="6" placeholder="En az 6 karakter"></div><button class="button primary" type="submit">Hesabı Oluştur</button></form><div class="hint">Demo sürümü: bilgiler yalnızca bu tarayıcıda saklanır.</div></div></div>
-  <div class="modal-wrap" id="balanceModal"><div class="modal"><button class="close" data-close="balanceModal">×</button><h2>Bakiye ekle</h2><p>Yüklemek istediğin tutarı seç. Canlı ödeme sağlayıcısı bağlanana kadar bu işlem demo bakiyesi olarak çalışır.</p><form id="balanceForm"><div class="field"><label>TUTAR (₺)</label><input required type="number" min="10" step="10" id="amount" value="100"></div><button class="button primary" type="submit">Bakiyeyi Güncelle</button></form></div></div>
+  <div class="modal-wrap" id="balanceModal"><div class="modal"><button class="close" data-close="balanceModal">×</button><h2>Demo bakiye ekle</h2><p>Bu işlem yalnızca test cüzdanına bakiye ekler; gerçek para, transfer veya ödeme yöntemi kullanılmaz.</p><form id="balanceForm"><div class="field"><label>DEMO TUTARI (₺)</label><input required type="number" min="10" max="100000" step="10" id="amount" value="100"></div><button class="button primary" type="submit">Demo Bakiyesini Ekle</button></form><div class="hint">Canlı ödeme sistemi bağlanana kadar bu bakiye yalnızca bu tarayıcıdaki test hesabında geçerlidir.</div></div></div>
   <div class="modal-wrap" id="profileModal"><div class="modal profile-modal"><button class="close" data-close="profileModal">×</button><div class="profile-head"><div class="avatar" id="profileAvatar">R</div><div><h2 id="profileName">Rivenna kullanıcısı</h2><p id="profileEmail">Hesap bilgilerin</p></div></div><div class="profile-tabs"><button class="profile-tab active" data-profile="summary">Hesap Özeti</button><button class="profile-tab" data-profile="details">Kullanıcı Bilgileri</button><button class="profile-tab" data-profile="security">Güvenlik</button></div><section class="profile-section active" id="summary"><div class="info-grid"><div class="info"><small>CÜZDAN BAKİYESİ</small><b id="profileBalance">₺0,00</b></div><div class="info"><small>HESAP DURUMU</small><b>Aktif hesap</b></div><div class="info"><small>SİPARİŞLER</small><b>0 sipariş</b></div><div class="info"><small>TESLİMAT</small><b>Dijital erişim açık</b></div></div><p class="profile-note">Sipariş geçmişi canlı veri bağlantısı yapıldığında burada görüntülenecek.</p></section><section class="profile-section" id="details"><form id="profileForm"><div class="field"><label>AD SOYAD</label><input required id="profileNameInput"></div><div class="field"><label>E-POSTA ADRESİ</label><input required type="email" id="profileEmailInput"></div><button class="button primary" type="submit">Bilgileri Kaydet</button></form><p class="profile-note">Bilgilerin yalnızca bu tarayıcıda tutulur.</p></section><section class="profile-section" id="security"><div class="security-row"><div><b>Hesap erişimi</b><br><span class="profile-note">Bu demo hesap yerel tarayıcı oturumunda çalışır.</span></div><b>AKTİF</b></div><form id="securityForm"><div class="security-row"><div><b>Ek güvenlik bildirimi</b><br><span class="profile-note">Hesap değişikliklerinde doğrulama iste.</span></div><input class="switch" id="twoFactor" type="checkbox"></div><button class="button primary" type="submit">Güvenlik Ayarını Kaydet</button></form><p class="profile-note">Gerçek parola değiştirme ve iki aşamalı doğrulama, sunucu taraflı kimlik sistemiyle eklenir.</p></section></div></div>
   <div class="modal-wrap" id="productModal"><div class="modal profile-modal"><button class="close" data-close="productModal">×</button><div class="eyebrow" id="detailType">ÜRÜN DETAYI</div><h2 id="detailName">Ürün</h2><p id="detailDesc"></p><div class="info-grid"><div class="info"><small>TESLİMAT</small><b>Anında dijital erişim</b></div><div class="info"><small>ÜRÜN TİPİ</small><b id="detailCategory">Yazılım</b></div></div><div class="buy" style="margin-top:18px"><span class="price" id="detailPrice">₺0</span><button class="small-add" id="detailBuy">BAKİYEYLE AL</button></div></div></div>
-  <div class="modal-wrap" id="paymentModal"><div class="modal"><button class="close" data-close="paymentModal">×</button><h2>Papara ile bakiye yükle</h2><p>Transferi aşağıdaki bilgilerle yap. Bakiye, ödeme doğrulandıktan sonra hesabına eklenir.</p><div class="field"><label>ÖDEME YÖNTEMİ</label><select id="paymentMethod"><option value="papara">Papara ile transfer</option><option value="iban">Banka havalesi / EFT</option></select></div><div class="info"><small>ALICI</small><b>Keremcan Ünlü · Papara</b></div><div class="info" style="margin-top:10px"><small>IBAN</small><b>TR74 0082 9000 0949 1838 8302 45</b></div><div class="field"><label>YÜKLENECEK TUTAR (₺)</label><input id="paymentAmount" type="number" min="10" value="100"></div><div class="info"><small>ÖDEME AÇIKLAMASI</small><b id="paymentNote">RIVENNA YAZILIM</b></div><button class="button primary" id="paymentNotice">Ödeme Bildirimi Oluştur</button><div class="hint">Ödeme yöntemleri hazırlık modundadır. Bildirimler manuel kontrol edilir; teyit olmadan işlem tamamlanmaz.</div></div></div>
+  <div class="modal-wrap" id="paymentModal"><div class="modal"><button class="close" data-close="paymentModal">×</button><h2>Demo ödeme ekranı</h2><p>Bu ekrandaki bilgiler yalnızca test içindir; gerçek transfer yapılmamalıdır.</p><div class="field"><label>ÖDEME YÖNTEMİ</label><select id="paymentMethod"><option value="papara">Papara ile transfer</option><option value="iban">Banka havalesi / EFT</option></select></div><div class="field" id="paparaTransferField"><label>PAPARA TRANSFER TÜRÜ</label><select id="paparaTransferType"><option value="iban">Papara IBAN ile transfer</option><option value="number">Papara numarası</option></select></div><div class="info"><small>ALICI · DEMO</small><b id="paymentRecipient">Örnek Alıcı</b></div><div class="info" id="paymentIbanInfo" style="margin-top:10px"><small id="paymentIbanLabel">DEMO PAPARA IBAN</small><b>TR00 0000 0000 0000 0000 0000 00</b></div><div class="info" id="paparaNumberInfo" style="margin-top:10px" hidden><small>PAPARA NUMARASI · DEMO</small><b>0000000000</b><br><small>Canlıya geçerken gerçek Papara numarasıyla değiştirilecek.</small></div><div class="field"><label>YÜKLENECEK TUTAR (₺)</label><input id="paymentAmount" type="number" min="10" value="100"></div><div class="info"><small>ÖDEME AÇIKLAMASI</small><b id="paymentNote">RIVENNA YAZILIM</b></div><button class="button primary" id="paymentNotice">Ödeme Bildirimi Oluştur</button><div class="hint">Demo akışıdır; para transferi yapılmaz ve bildirimler yalnızca test amaçlıdır.</div></div></div>
   <div class="toast" id="toast"></div>
   <script>
   const $=s=>document.querySelector(s),toast=$('#toast');let cart=0;
@@ -320,7 +356,7 @@
   const open=id=>$('#'+id).classList.add('open'),close=id=>$('#'+id).classList.remove('open');
   $('#registerButton').onclick=()=>open('accountModal');$('#heroAccount').onclick=()=>open('accountModal');$('#openAccount').onclick=()=>open('accountModal');document.querySelectorAll('[data-close]').forEach(x=>x.onclick=()=>close(x.dataset.close));document.querySelectorAll('.modal-wrap').forEach(x=>x.onclick=e=>{if(e.target===x)close(x.id)});
   $('#registerForm').onsubmit=e=>{e.preventDefault();const isNew=!localStorage.getItem('rivennaAccount'),a={name:$('#name').value.trim(),email:$('#email').value.trim(),balance:0};localStorage.setItem('rivennaAccount',JSON.stringify(a));if(isNew){const s=JSON.parse(localStorage.getItem('rivennaStats')||'{"accounts":0}');s.accounts++;localStorage.setItem('rivennaStats',JSON.stringify(s))}close('accountModal');update();flash('Rivenna hesabın hazır. Hoş geldin!')};
-  $('#addBalance').onclick=()=>localStorage.getItem('rivennaAccount')?open('balanceModal'):open('accountModal');$('#balanceForm').onsubmit=e=>{e.preventDefault();const a=JSON.parse(localStorage.getItem('rivennaAccount'));a.balance=Number(a.balance)+Number($('#amount').value);localStorage.setItem('rivennaAccount',JSON.stringify(a));close('balanceModal');update();flash('Demo bakiyesi güncellendi.')};
+  $('#addBalance').onclick=()=>localStorage.getItem('rivennaAccount')?open('balanceModal'):open('accountModal');$('#balanceForm').onsubmit=e=>{e.preventDefault();const amount=Number($('#amount').value);if(!Number.isFinite(amount)||amount<10||amount>100000)return flash('Demo tutarı 10 ₺ ile 100.000 ₺ arasında olmalı.');const modal=$('#paymentModal');modal.dataset.flow='balance';modal.querySelector('h2').textContent='Demo bakiye yükleme';modal.querySelector('p').textContent='Tutarını ve ödeme yöntemini seçerek test bildirimini oluştur. Bakiye onay olmadan değişmez.';$('#paymentAmount').value=amount;$('#paymentAmount').readOnly=true;$('#paymentNote').textContent='RIVENNA DEMO BAKİYE '+Date.now().toString().slice(-6);close('balanceModal');open('paymentModal')};
   function renderProfile(){const a=JSON.parse(localStorage.getItem('rivennaAccount'));if(!a)return;$('#profileName').textContent=a.name;$('#profileEmail').textContent=a.email;$('#profileAvatar').textContent=a.name.charAt(0).toUpperCase();$('#profileBalance').textContent='₺'+Number(a.balance||0).toLocaleString('tr-TR',{minimumFractionDigits:2});$('#profileNameInput').value=a.name;$('#profileEmailInput').value=a.email;$('#twoFactor').checked=!!a.twoFactor}
   document.querySelectorAll('[data-profile]').forEach(b=>b.onclick=()=>{document.querySelectorAll('[data-profile]').forEach(x=>x.classList.toggle('active',x===b));document.querySelectorAll('.profile-section').forEach(x=>x.classList.toggle('active',x.id===b.dataset.profile))});
   $('#profileForm').onsubmit=e=>{e.preventDefault();const a=JSON.parse(localStorage.getItem('rivennaAccount'));a.name=$('#profileNameInput').value.trim();a.email=$('#profileEmailInput').value.trim();localStorage.setItem('rivennaAccount',JSON.stringify(a));update();renderProfile();flash('Hesap bilgilerin güncellendi.')};
@@ -328,8 +364,36 @@
   $('#accountButton').onclick=()=>{if(!localStorage.getItem('rivennaAccount'))return open('accountModal');renderProfile();open('profileModal')};document.querySelectorAll('.small-add').forEach(b=>b.onclick=()=>{cart++;flash(b.dataset.product+' sepete eklendi · '+cart+' ürün')});
   </script>
   <script>
-  $('#addBalance').onclick=()=>{if(!localStorage.getItem('rivennaAccount'))return open('accountModal');$('#paymentModal h2').textContent='Papara ile bakiye yükle';$('#paymentModal p').textContent='Transferi aşağıdaki bilgilerle yap. Bakiye, ödeme doğrulandıktan sonra hesabına eklenir.';$('#paymentAmount').readOnly=false;$('#paymentNote').textContent='RIVENNA YAZILIM '+Date.now().toString().slice(-5);open('paymentModal')};
-  $('#paymentNotice').onclick=()=>{const a=JSON.parse(localStorage.getItem('rivennaAccount')||'null'),amount=Number($('#paymentAmount').value);if(!a||amount<10)return flash('Geçerli bir tutar gir.');localStorage.setItem('rivennaPayment',JSON.stringify({amount,method:$('#paymentMethod').value,note:$('#paymentNote').textContent,status:'Onay bekliyor',createdAt:new Date().toISOString()}));close('paymentModal');flash('Ödeme bildirimin alındı. Manuel onay sonrası işlem tamamlanacak.')};
+  $('#addBalance').onclick=()=>{if(!localStorage.getItem('rivennaAccount'))return open('accountModal');open('balanceModal')};
+  const updatePaymentMethod=()=>{const papara=$('#paymentMethod').value==='papara',type=$('#paparaTransferType').value;$('#paparaTransferField').hidden=!papara;$('#paparaNumberInfo').hidden=!(papara&&type==='number');$('#paymentIbanInfo').hidden=papara&&type==='number';$('#paymentIbanLabel').textContent=papara?'DEMO PAPARA IBAN':'DEMO IBAN'};$('#paymentMethod').onchange=updatePaymentMethod;$('#paparaTransferType').onchange=updatePaymentMethod;updatePaymentMethod();
+  $('#paymentNotice').onclick=()=>{const a=JSON.parse(localStorage.getItem('rivennaAccount')||'null'),amount=Number($('#paymentAmount').value),modal=$('#paymentModal'),purpose=modal.dataset.flow||'order';if(!a||amount<10)return flash('Geçerli bir tutar gir.');localStorage.setItem('rivennaPayment',JSON.stringify({amount,purpose,method:$('#paymentMethod').value,transferType:$('#paymentMethod').value==='papara'?$('#paparaTransferType').value:'iban',note:$('#paymentNote').textContent,status:'Demo onay bekliyor',createdAt:new Date().toISOString()}));delete modal.dataset.flow;close('paymentModal');flash(purpose==='balance'?'Bakiye yükleme bildirimin oluşturuldu. Onay olmadan cüzdan değişmez.':'Ödeme bildirimin alındı. Manuel onay sonrası işlem tamamlanacak.')};
+  $('#paymentModal').addEventListener('click',event=>{if(event.target===$('#paymentModal'))delete $('#paymentModal').dataset.flow});document.querySelector('[data-close="paymentModal"]').addEventListener('click',()=>delete $('#paymentModal').dataset.flow);
+  </script>
+  <script>
+  /* Sepet ödeme düğmesi: eski sepet kodundan bağımsız, tek adımlı yönlendirme. */
+  document.addEventListener('click', event => {
+    const checkout = event.target.closest('#cartCheckout');
+    if (!checkout) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    let items = [];
+    try { items = JSON.parse(localStorage.getItem('rivennaCart') || '[]'); } catch { items = []; }
+    if (!items.length) return flash('Sepetin şu an boş.');
+    if (!localStorage.getItem('rivennaAccount')) {
+      document.documentElement.classList.remove('cart-open');
+      document.querySelector('#accountButton').click();
+      return;
+    }
+    const total = items.reduce((sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0), 0);
+    const modal = document.querySelector('#paymentModal');
+    modal.querySelector('h2').textContent = 'Demo sipariş ödemesi';
+    modal.querySelector('p').textContent = 'Ödeme yöntemini seçerek test akışını inceleyebilirsin. Gerçek transfer yapılmaz.';
+    document.querySelector('#paymentAmount').value = total;
+    document.querySelector('#paymentAmount').readOnly = true;
+    document.querySelector('#paymentNote').textContent = 'RIVENNA SİPARİŞ ' + Date.now().toString().slice(-6);
+    document.documentElement.classList.remove('cart-open');
+    modal.classList.add('open');
+  }, true);
   </script>
   <script>
   const navPages={
@@ -343,4 +407,4 @@
   function openPage(k){document.querySelector('#pageContent').innerHTML=navPages[k]||'';page.classList.add('open');window.scrollTo(0,0)}
   function closePage(){page.classList.remove('open')}
   </script>
-<script>document.querySelector('nav a[href="#urunler"]').href='products.html';const details=[{n:'FocusFlow Pro',c:'Üretkenlik',d:'Görevlerini, projelerini ve günlük planını tek çalışma alanında düzenle.',p:349},{n:'PixelCraft Kit',c:'Tasarım',d:'Hızlı prototipleme için seçili yaratıcı varlık paketi.',p:499},{n:'DevStack Tools',c:'Geliştirici',d:'Geliştirme akışını sadeleştiren pratik araç koleksiyonu.',p:649}];let chosen;function showProduct(i){chosen=details[i];$('#detailType').textContent=chosen.c.toUpperCase();$('#detailName').textContent=chosen.n;$('#detailDesc').textContent=chosen.d;$('#detailCategory').textContent=chosen.c;$('#detailPrice').textContent='₺'+chosen.p;open('productModal')}document.querySelectorAll('.product').forEach((card,i)=>{card.style.cursor='pointer';card.addEventListener('click',e=>{if(!e.target.closest('button'))showProduct(i)})});$('#detailBuy').onclick=()=>{const a=JSON.parse(localStorage.getItem('rivennaAccount')||'null');if(!a)return flash('Önce hesap oluşturmalısın.');if(Number(a.balance||0)<chosen.p)return flash('Yetersiz bakiye. Hesabından bakiye ekle.');a.balance-=chosen.p;a.orders=[...(a.orders||[]),{name:chosen.n,price:chosen.p}];localStorage.setItem('rivennaAccount',JSON.stringify(a));close('productModal');update();flash(chosen.n+' hesabına eklendi!')};</script></body></html>
+<script>document.querySelector('nav a[href="#urunler"]').href='#urunler';const details=[{n:'FocusFlow Pro',c:'Üretkenlik',d:'Görevlerini, projelerini ve günlük planını tek çalışma alanında düzenle.',p:349},{n:'PixelCraft Kit',c:'Tasarım',d:'Hızlı prototipleme için seçili yaratıcı varlık paketi.',p:499},{n:'DevStack Tools',c:'Geliştirici',d:'Geliştirme akışını sadeleştiren pratik araç koleksiyonu.',p:649}];let chosen;function showProduct(i){chosen=details[i];$('#detailType').textContent=chosen.c.toUpperCase();$('#detailName').textContent=chosen.n;$('#detailDesc').textContent=chosen.d;$('#detailCategory').textContent=chosen.c;$('#detailPrice').textContent='₺'+chosen.p;open('productModal')}document.querySelectorAll('.product').forEach((card,i)=>{card.style.cursor='pointer';card.addEventListener('click',e=>{if(!e.target.closest('button'))showProduct(i)})});$('#detailBuy').onclick=()=>{const a=JSON.parse(localStorage.getItem('rivennaAccount')||'null');if(!a)return flash('Önce hesap oluşturmalısın.');if(Number(a.balance||0)<chosen.p)return flash('Yetersiz bakiye. Hesabından bakiye ekle.');a.balance-=chosen.p;a.orders=[...(a.orders||[]),{name:chosen.n,price:chosen.p}];localStorage.setItem('rivennaAccount',JSON.stringify(a));close('productModal');update();flash(chosen.n+' hesabına eklendi!')};</script></body></html>
